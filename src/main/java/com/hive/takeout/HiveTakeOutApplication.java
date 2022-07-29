@@ -13,6 +13,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class HiveTakeOutApplication {
     public static void main(String[] args) {
         SpringApplication.run(HiveTakeOutApplication.class,args);
-        log.info("小小的外卖项目启动成功");
+        log.info("外卖项目启动成功");
     }
 }
