@@ -9,7 +9,9 @@ import com.hive.takeout.common.R;
 import com.hive.takeout.dto.DishDto;
 import com.hive.takeout.entity.Category;
 import com.hive.takeout.entity.Dish;
+import com.hive.takeout.entity.DishFlavor;
 import com.hive.takeout.service.CateGoryService;
+import com.hive.takeout.service.DishFlavorService;
 import com.hive.takeout.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -30,6 +32,9 @@ public class DishController {
 
     @Autowired
     private CateGoryService cateGoryService;
+
+    @Autowired
+    private DishFlavorService dishFlavorService;
     //增加菜品
     @PostMapping
     public R<String> save(@RequestBody DishDto dishDto){
@@ -126,11 +131,23 @@ public class DishController {
 
     //查询菜品
     @GetMapping("/list")
-    public R<List<Dish>> listDish(Long categoryId){
+    public R<List<DishDto>> listDish(Long categoryId){
         log.info("查询菜品"+categoryId);
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper();
         queryWrapper.eq(categoryId!=null,Dish::getCategoryId,categoryId);
         List<Dish> list = dishService.list(queryWrapper);
-        return R.success(list);
+
+        List<DishDto> dishDtoList = new ArrayList<>();
+        list.forEach(item ->{
+            DishDto dishDto = new DishDto();
+            BeanUtils.copyProperties(item,dishDto);
+            Long id = item.getId();
+            LambdaQueryWrapper<DishFlavor> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(id!=null,DishFlavor::getDishId,id);
+            List<DishFlavor> dishFlavors = dishFlavorService.list(wrapper);
+            dishDto.setFlavors(dishFlavors);
+            dishDtoList.add(dishDto);
+        });
+        return R.success(dishDtoList);
     }
 }

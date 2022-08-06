@@ -15,6 +15,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -109,5 +110,17 @@ public class SetMealController {
         }
 
         return R.success("套餐停售成功");
+    }
+
+    //查询指定的套餐
+    @GetMapping("/list")
+    public R<List<Setmeal>> getList(Long categoryId,Long status){
+        log.info("categoryId"+categoryId+"status"+status);
+
+        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(categoryId!=null,Setmeal::getCategoryId,categoryId);
+        queryWrapper.eq(status!=null,Setmeal::getStatus,status);
+        List<Setmeal> list1 = setMealService.list(queryWrapper);
+        return R.success(list1);
     }
 }

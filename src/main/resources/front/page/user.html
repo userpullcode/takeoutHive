@@ -172,7 +172,7 @@
                     const res = await orderAgainApi({id:this.order[0].id})
                     if(res.code === 1){
                         window.requestAnimationFrame(()=>{
-                            window.location.href = '/front/index.html'
+                            window.location.href = 'index.html'
                         }) 
                     }else{
                         this.$notify({ type:'warning', message:res.msg});

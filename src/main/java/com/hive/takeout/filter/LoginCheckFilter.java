@@ -31,7 +31,8 @@ public class LoginCheckFilter implements Filter {
                 "/employee/login",
                 "/employee/logout",
                 "/backend/**",
-                "/front/**"
+                "/front/**",
+                "/user/login"
         };
 
         //判断本次请求是否要进行放行
@@ -44,11 +45,20 @@ public class LoginCheckFilter implements Filter {
             return;
         }
 
-        //判断登录状态，如果已登录就直接放行
+        //判断PC端登录状态，如果已登录就直接放行
         Long employeeId = (Long) request.getSession().getAttribute("userId");
         log.info("登录状态："+employeeId);
         if (employeeId!=null){
             TreadLocalContent.set(employeeId);
+            filterChain.doFilter(request,response);
+            return;
+        }
+
+        //判断移动端登录状态，如果已登录就直接放行
+        Long userPhone = (Long) request.getSession().getAttribute("userPhoneId");
+        log.info("登录状态："+userPhone);
+        if (userPhone!=null){
+            TreadLocalContent.set(userPhone);
             filterChain.doFilter(request,response);
             return;
         }
