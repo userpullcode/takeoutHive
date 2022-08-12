@@ -99,7 +99,6 @@ public class DishController {
     //保存菜品
     @PutMapping
     public R<String> put(@RequestBody DishDto dishDto){
-        log.info("保存菜品");
 
         //删除对应菜品的redis缓存
         String key = "dish_"+dishDto.getCategoryId()+"status_"+dishDto.getStatus();
