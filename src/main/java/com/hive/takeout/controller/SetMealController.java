@@ -13,6 +13,8 @@ import com.hive.takeout.service.SetMealService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ public class SetMealController {
 
     //保存套餐
     @PostMapping
+    @CacheEvict(value = "setmealCache",key = "'setmeal_'+#setmealDto.categoryId")
     public R<String> save(@RequestBody SetmealDto setmealDto){
         log.info("保存套餐");
         setMealService.saveMeal(setmealDto);
@@ -68,6 +71,7 @@ public class SetMealController {
 
     //保存修改的套餐
     @PutMapping
+    @CacheEvict(value = "setmealCache",key = "'setmeal+'+#setmealDto.categoryId")
     public R<String> update(@RequestBody SetmealDto setmealDto){
         log.info("保存修改的套餐");
         setMealService.updateSetMealAndDish(setmealDto);
@@ -76,6 +80,7 @@ public class SetMealController {
 
     //删除（批量）套餐
     @DeleteMapping
+    @CacheEvict(value = "setmealCache",allEntries = true)
     public R<String> delete(Long[] ids){
         log.info("删除（批量）套餐");
         setMealService.delete(ids);
@@ -112,8 +117,15 @@ public class SetMealController {
         return R.success("套餐停售成功");
     }
 
-    //查询指定的套餐
+    /**
+     * 查询指定的套餐
+     * 注意：unless是对返回结果的判断，condition是对方法体执行前的判断
+     * @param categoryId
+     * @param status
+     * @return
+     */
     @GetMapping("/list")
+    @Cacheable(value = "setmealCache",key = "'setmeal_'+#categoryId",unless = "#result == null ")
     public R<List<Setmeal>> getList(Long categoryId,Long status){
         log.info("categoryId"+categoryId+"status"+status);
 
